@@ -7,9 +7,9 @@ output: html_document
 
 El objetivo de la prueba es procesar la información anterior para responder las siguientes preguntas y ejercicios:
 
-1.   ¿Cuales son las zonas más concurridas de la ciudad ?
+1.   ¿Cuántos dispositivos y de que tipo se encuentran en cada zona de la ciudad?
 
-2.   ¿Cuántos dispositivos y de que tipo se encuentran en cada zona de la ciudad?
+2.   ¿Cuales son las zonas más concurridas de la ciudad ?
 
 3.   ¿Cuales son las zonas más importantes (transaccionalmente) para cada cliente (donde realiza el 65% de sus compras)?. Nota:  Todos los clientes deben tener al menos una zona de influencia.
 
@@ -42,3 +42,25 @@ str(data_clientes)
 ```
 
 Notemos que muchas de estas variables son de tipo categoricas, es decir que aunque son representadas con números no se puede hacer ninguna operación matemática con ellas. Es por eso que las leemos como tipo "character" para evitar errores.
+
+###1. ¿Cuántos dispositivos y de que tipo se encuentran en cada zona de la ciudad?
+
+Empecemos diciendo que hay `r length(data_dispositivos$id_disp)` dispositivos y que son `r length(table(data_dispositivos$tipo_disp))` tipos distintos de dispositivos los que están distribuidos por toda la ciudad.
+
+```{r,echo=TRUE}
+tiposdisp_ciudad<-table(data_dispositivos$tipo_disp)# obtenemos la cantidad
+#de cada tipo de dispositivo en toda la ciudad
+
+barplot(tiposdisp_ciudad,xlab = 'Tipo',ylab = 'Cantidad',main = 'Dispositivos de acuerdo a su tipo en la ciudad')
+```
+
+Así tenemos una primera fotografía de lo que pasa en la ciudad, pues estos `r length(data_dispositivos$id_disp)` dispositivos físicos se encuentran distribuidos en `r length(table(data_dispositivos$id_barrio))` barrios.
+
+```{r,echo=TRUE}
+library(data.table)
+library(plyr)
+table_barrios<-data.table(data_barrios,key = 'id_barrio')
+table_dispositivos<-data.table(data_dispositivos,key = 'id_disp')
+table_clientes<-data.table(data_clientes,key = 'id_cliente')
+
+```
