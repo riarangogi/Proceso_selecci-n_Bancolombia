@@ -1,0 +1,44 @@
+---
+title: "Untitled"
+author: "Ricardo Arango Giraldo"
+date: "6 de febrero de 2018"
+output: html_document
+---
+
+El objetivo de la prueba es procesar la información anterior para responder las siguientes preguntas y ejercicios:
+
+1.   ¿Cuales son las zonas más concurridas de la ciudad ?
+
+2.   ¿Cuántos dispositivos y de que tipo se encuentran en cada zona de la ciudad?
+
+3.   ¿Cuales son las zonas más importantes (transaccionalmente) para cada cliente (donde realiza el 65% de sus compras)?. Nota:  Todos los clientes deben tener al menos una zona de influencia.
+
+4.    Identifique una forma de identificar una zona distinta a los barrios.  Como lo haría?, proponga un codigo para hacerlo.
+
+###0. Cargando los datos
+
+Como ya los datos fueron limpiados y ordenados (ver "script limpiar datos.R"), el análisis se puede hacer sin preocuparnos por datos faltantes (NA) o por valores anomalos.
+
+```{r,echo=TRUE}
+data_barrios<-read.csv('./Datos Limpios/barrios_tidy.csv',header = TRUE,
+                       sep = ',',stringsAsFactors = FALSE,
+                       colClasses = c('character','character'))
+
+data_dispositivos<-read.csv('./Datos Limpios/dispositivos_tidy.csv',
+                            header = TRUE,sep = ',',stringsAsFactors = FALSE,
+                            colClasses = c('character','character','numeric',
+                                           'numeric','character'))
+
+data_clientes<-read.csv('./Datos Limpios/clientes_tidy.csv',sep = ',',
+                            header = TRUE,stringsAsFactors = FALSE,
+                            colClasses = c('character','character',
+                                           'character','character','integer'))
+
+str(data_barrios)
+
+str(data_dispositivos)
+
+str(data_clientes)
+```
+
+Notemos que muchas de estas variables son de tipo categoricas, es decir que aunque son representadas con números no se puede hacer ninguna operación matemática con ellas. Es por eso que las leemos como tipo "character" para evitar errores.
