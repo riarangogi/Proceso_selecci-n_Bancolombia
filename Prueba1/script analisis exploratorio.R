@@ -49,3 +49,8 @@ min_numdoc_clientes#El minimo es negativo, con lo que nos aseguramos que
 
 table(data_clientes$tipo_doc)#Hay 14 datos anomalos en esta columna, tipo_doc
 # =4 y tipo_doc=9
+
+##5 Limpiamos los datos borrando los valores anomalos
+data_clientes_tidy<-subset(data_clientes,
+                           subset = num_doc>0 & tipo_doc %in% c(1,2) ,
+                           select = num_doc:num_trx)
