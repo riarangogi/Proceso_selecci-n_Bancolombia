@@ -54,3 +54,12 @@ table(data_clientes$tipo_doc)#Hay 14 datos anomalos en esta columna, tipo_doc
 data_clientes_tidy<-subset(data_clientes,
                            subset = num_doc>0 & tipo_doc %in% c(1,2) ,
                            select = num_doc:num_trx)
+
+##6 Ponemos los mismos nombres de columnas en las tablas
+names(data_barrios)<-c('id_barrio','nombre_barrio')
+
+names(data_dispositivos)<-c('tipo_disp','id_disp','latitud','longitud',
+                            'id_barrio')
+
+names(data_clientes_tidy)<-c('id_cliente','tipo_doc','tipo_disp','id_disp',
+                             'num_trx')
