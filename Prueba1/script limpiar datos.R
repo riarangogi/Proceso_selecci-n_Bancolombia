@@ -67,8 +67,10 @@ names(data_clientes_tidy)<-c('id_cliente','tipo_doc','tipo_disp','id_disp',
 ##7 Guardamos los datos ya limpios
 dir.create('./Datos Limpios')
 
-write.csv('./Datos Limpios/barrios_tidy.csv',row.names = FALSE)
+write.csv(data_barrios,'./Datos Limpios/barrios_tidy.csv',row.names = FALSE)
 
-write.csv('./Datos Limpios/dispositivos_tidy.csv',row.names = FALSE)
+write.csv(data_dispositivos,'./Datos Limpios/dispositivos_tidy.csv',
+          row.names = FALSE)
 
-write.csv('./Datos Limpios/clientes_tidy.csv',row.names = FALSE)
+write.csv(data_clientes_tidy,'./Datos Limpios/clientes_tidy.csv',
+          row.names = FALSE)
