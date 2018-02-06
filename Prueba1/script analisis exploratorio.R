@@ -46,3 +46,6 @@ min_coddispositivo_clientes#El minimo es positivo, con lo que nos aseguramos
 min_numdoc_clientes<-min(data_clientes$num_doc)
 min_numdoc_clientes#El minimo es negativo, con lo que nos aseguramos que
 # almenos uno es negativo
+
+table(data_clientes$tipo_doc)#Hay 14 datos anomalos en esta columna, tipo_doc
+# =4 y tipo_doc=9
