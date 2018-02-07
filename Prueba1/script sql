@@ -11,7 +11,7 @@ CREATE TABLE barrios (
 );
 
 -- Entre la tabla barrios y la tabla dispositivos hay una relación de uno a
--- muchos (Un barriio puede tener muchos dispositivos, pero un dispositivo
+-- muchos (Un barrio puede tener muchos dispositivos, pero un dispositivo
 -- solo puede estar en un barrio).
 -- Puesto que la tabla "padre" es barrios, la tabla "hija" hereda su id como
 -- una llave foranea
@@ -25,3 +25,15 @@ CREATE TABLE dispositivos (
 
 );
 
+-- Entre la tabla dispositivos y la tabla clientes hay una relación de muchos a
+-- muchos (Un dispositivo puede atenteder muchos clientes y un cliente puede
+-- usar muchos dispositivos).
+
+CREATE TABLE clientes (
+	id_cliente int(25) primary key,
+	tipo_doc int,
+	tipo_disp  varchar(15),
+	id_disp int(15) references dispositivos(id_disp),
+	num_trx int
+
+);
