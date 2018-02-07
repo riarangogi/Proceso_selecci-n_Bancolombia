@@ -5,6 +5,8 @@ CREATE DATABASE bancolombia_prueba1 CHARACTER SET utf8 COLLATE utf8_general_ci;
 -- Entre la tabla clientes y la tabla barrios no hay relación,
 
 CREATE TABLE barrios (
-
+	id_barrio int(15) primary key,
+	nombre_barrio varchar(20)
 
 );
+
