@@ -15,52 +15,105 @@ El objetivo de la prueba es procesar la información anterior para responder las
 
 4.    Identifique una forma de identificar una zona distinta a los barrios.  Como lo haría?, proponga un codigo para hacerlo.
 
-###0. Cargando los datos
+###0. Limpiando los datos
 
-Como ya los datos fueron limpiados y ordenados (ver "script limpiar datos.R"), el análisis se puede hacer sin preocuparnos por datos faltantes (NA) o por valores anomalos.
+Como primero nosotros cargaremos los "datos crudos", estos son 3 archivos .csv y se encuentran almacenados en una carpeta llamada "Datos Crudos" de nuestro directorio de trabajo:
+
+·         exa__barrios_cali : Una lista con los barrios de la ciudad de cali
+
+·         exa__dispositivos_cali: Una lista con dispositivos de canales físicos en la ciudad de Cali (Sucursales, ATM dispensador y Multifuncional, Corresponsales , PAC y establecimientos - POS) . La información incluye su posición geográfica.
+
+·         exa__trx_clientes : contiene el número  transacciones de varios clientes realizados en algunos de  los anteriores dispositivos.
 
 ```{r,echo=TRUE}
-data_barrios<-read.csv('./Datos Limpios/barrios_tidy.csv',header = TRUE,
-                       sep = ',',stringsAsFactors = FALSE,
-                       colClasses = c('character','character'))
+#Los 3 son archivos separados por comas y con encabezados (nombres de columnas)
+data_barrios<-read.csv('Datos Crudos/exa__barrios_cali.csv',sep = ',',
+                       header = TRUE,stringsAsFactors = FALSE )
 
-data_dispositivos<-read.csv('./Datos Limpios/dispositivos_tidy.csv',
-                            header = TRUE,sep = ',',stringsAsFactors = FALSE,
-                            colClasses = c('character','character','numeric',
-                                           'numeric','character'))
+data_dispositivos<-read.csv('Datos Crudos/exa__dispositivos_cali.csv',
+                            sep = ',', header = TRUE,
+                            stringsAsFactors = FALSE )
 
-data_clientes<-read.csv('./Datos Limpios/clientes_tidy.csv',sep = ',',
-                            header = TRUE,stringsAsFactors = FALSE,
-                            colClasses = c('character','character',
-                                           'character','character','integer'))
+data_clientes<-read.csv('Datos Crudos/exa__trx_clientes.csv',sep = ',',
+                       header = TRUE,stringsAsFactors = FALSE )
+#El argumento stringsAsFactors es para evitar que salgan factores que pueden ser molestos  para los algoritmos de limpieza
+```
 
+Hacemos un resumen de las columnas presentes en cada archivo con el fin de advertir una anomalia a simple vista
+
+```{r,echo=TRUE}
 str(data_barrios)
 
 str(data_dispositivos)
 
-str(data_clientes)
+str(data_clientes)#La columna num_doc pese a ser númerica, por lo que representa no puede contener valores negativos
 ```
 
-Notemos que muchas de estas variables son de tipo categoricas, es decir que aunque son representadas con números no se puede hacer ninguna operación matemática con ellas. Es por eso que las leemos como tipo "character" para evitar errores.
+notemos que muchas de estas variables son de tipo categoricas, es decir que aunque son representadas con números no se puede hacer ninguna operación matemática con ellas.
 
-###1. ¿Cuántos dispositivos y de que tipo se encuentran en cada zona de la ciudad?
-
-Empecemos diciendo que hay `r length(data_dispositivos$id_disp)` dispositivos y que son `r length(table(data_dispositivos$tipo_disp))` tipos distintos de dispositivos los que están distribuidos por toda la ciudad.
+Busquemos ahora si hay datos faltantes (NA) y valores anomalos
 
 ```{r,echo=TRUE}
-tiposdisp_ciudad<-table(data_dispositivos$tipo_disp)# obtenemos la cantidad
-#de cada tipo de dispositivo en toda la ciudad
+#La función complete.cases nos dice en que filas no hay NA
+barrios_na<-complete.cases(data_barrios)
+table(barrios_na) #No hay valores faltantes
 
-barplot(tiposdisp_ciudad,xlab = 'Tipo',ylab = 'Cantidad',main = 'Dispositivos de acuerdo a su tipo en la ciudad')
+dispositivos_na<-complete.cases(data_dispositivos)
+table(dispositivos_na) #No hay valores faltantes
+
+clientes_na<-complete.cases(data_clientes)
+table(clientes_na) #No hay valores faltantes
 ```
 
-Así tenemos una primera fotografía de lo que pasa en la ciudad, pues estos `r length(data_dispositivos$id_disp)` dispositivos físicos se encuentran distribuidos en `r length(table(data_dispositivos$id_barrio))` barrios.
+Tal como se advirtio más arriba, las variables que denotan algún número de identificación no pueden ser negativas, Así, usaremos esta premisa para detectar valores perdidos (o anomalos)
 
 ```{r,echo=TRUE}
-library(data.table)
-library(plyr)
-table_barrios<-data.table(data_barrios,key = 'id_barrio')
-table_dispositivos<-data.table(data_dispositivos,key = 'id_disp')
-table_clientes<-data.table(data_clientes,key = 'id_cliente')
+min_codigo_barrios<-min(data_barrios$codigo)
+min_codigo_barrios #El minimo es positivo, con lo que nos aseguramos que ninguno es negativo
 
+min_codigo_dispositivos<-min(data_dispositivos$codigo)
+min_codigo_dispositivos#El minimo es positivo, con lo que nos aseguramos que ninguno es negativo
+
+min_idbarrio_dispositivos<-min(data_dispositivos$id_barrio)
+min_idbarrio_dispositivos#El minimo es positivo, con lo que nos aseguramos que ninguno es negativo
+
+min_coddispositivo_clientes<-min(data_clientes$cod_dispositivo)
+min_coddispositivo_clientes#El minimo es positivo, con lo que nos aseguramos que ninguno es negativo
+
+min_numdoc_clientes<-min(data_clientes$num_doc)
+min_numdoc_clientes#El minimo es negativo, con lo que nos aseguramos que  almenos uno es negativo
+
+table(data_clientes$tipo_doc)#Hay 14 datos anomalos en esta columna, tipo_doc  =4 y tipo_doc=9
+```
+
+Ya que no hay valores ausentes y solamente encontramos valores anomalos en el archivo alusivo a los clientes, entonces procedemos a crear un nuevo data frame sin tales valores
+
+```{r,echo=TRUE}
+data_clientes_tidy<-subset(data_clientes,
+                           subset = num_doc>0 & tipo_doc %in% c(1,2) ,#solo consideramos las filas con num_doc positivo y que el tipo_doc sea 1 o 2
+                           select = num_doc:num_trx)
+```
+
+Ahora solo queda cambiar de nombre las columnas y guardar los datos limpios.
+
+```{r,echo=TRUE}
+#Ponemos los mismos nombres de columnas en las tablas
+names(data_barrios)<-c('id_barrio','nombre_barrio')
+
+names(data_dispositivos)<-c('tipo_disp','id_disp','latitud','longitud',
+                            'id_barrio')
+
+names(data_clientes_tidy)<-c('id_cliente','tipo_doc','tipo_disp','id_disp',
+                             'num_trx')
+
+#Creeamos una carpeta llamada "Datos Limpios" para guardar los archivos allí
+dir.create('./Datos Limpios')
+
+write.csv(data_barrios,'./Datos Limpios/barrios_tidy.csv',row.names = FALSE)
+
+write.csv(data_dispositivos,'./Datos Limpios/dispositivos_tidy.csv',
+          row.names = FALSE)
+
+write.csv(data_clientes_tidy,'./Datos Limpios/clientes_tidy.csv',
+          row.names = FALSE)
 ```
