@@ -1,0 +1,10 @@
+--Crear la base de datos bancolombia_prueba1 con codificación utf-8
+CREATE DATABASE bancolombia_prueba1 CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+-- Son 3 tablas: barrios, dispositivos y clientes.
+-- Entre la tabla clientes y la tabla barrios no hay relación,
+
+CREATE TABLE barrios (
+
+
+);
