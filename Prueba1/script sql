@@ -2,6 +2,8 @@
 CREATE DATABASE bancolombia_prueba1 CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 -- Son 3 tablas: barrios, dispositivos y clientes.
+
+USE bancolombia_prueba1;
 -- Entre la tabla clientes y la tabla barrios no hay relación,
 
 CREATE TABLE barrios (
@@ -21,9 +23,11 @@ CREATE TABLE dispositivos (
 	id_disp int(15) primary key,
 	latitud float,
 	longitud float,
-	id_barrio int(15) references barrios(id_barrio)
+	id_barrio int(15),
+	FOREIGN KEY (id_barrio) REFERENCES barrios(id_barrio)
 
 );
+
 
 -- Entre la tabla dispositivos y la tabla clientes hay una relación de muchos a
 -- muchos (Un dispositivo puede atenteder muchos clientes y un cliente puede
@@ -33,7 +37,8 @@ CREATE TABLE clientes (
 	id_cliente int(25) primary key,
 	tipo_doc int,
 	tipo_disp  varchar(15),
-	id_disp int(15) references dispositivos(id_disp),
-	num_trx int
+	id_disp int(15),
+	num_trx int,
+	FOREIGN KEY (id_disp) REFERENCES dispositivos(id_disp)
 
 );
