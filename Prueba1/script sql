@@ -42,3 +42,13 @@ CREATE TABLE clientes (
 	FOREIGN KEY (id_disp) REFERENCES dispositivos(id_disp)
 
 );
+
+--Ya creadas las tablas con sus respectivas relaciones, procedemos a importar
+-- los archivos .csv. Usaremoos los daatos limpios
+
+LOAD DATA LOCAL INFILE '/media/riarangogi/DOCUMENTOS/Projects/Bancolombia/Prueba1/Datos Limpios/barrios_tidy.csv'
+INTO TABLE barrios
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
