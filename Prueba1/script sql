@@ -10,3 +10,18 @@ CREATE TABLE barrios (
 
 );
 
+-- Entre la tabla barrios y la tabla dispositivos hay una relación de uno a
+-- muchos (Un barriio puede tener muchos dispositivos, pero un dispositivo
+-- solo puede estar en un barrio).
+-- Puesto que la tabla "padre" es barrios, la tabla "hija" hereda su id como
+-- una llave foranea
+
+CREATE TABLE dispositivos (
+	tipo_disp varchar(15),
+	id_disp int(15) primary key,
+	latitud float,
+	longitud float,
+	id_barrio int(15) references barrios(id_barrio)
+
+);
+
