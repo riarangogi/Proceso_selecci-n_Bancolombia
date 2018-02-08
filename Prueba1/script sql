@@ -52,3 +52,17 @@ FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
+
+LOAD DATA LOCAL INFILE '/media/riarangogi/DOCUMENTOS/Projects/Bancolombia/Prueba1/Datos Limpios/dispositivos_tidy.csv'
+INTO TABLE dispositivos
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+
+LOAD DATA LOCAL INFILE '/media/riarangogi/DOCUMENTOS/Projects/Bancolombia/Prueba1/Datos Limpios/clientes_tidy.csv'
+INTO TABLE clientes
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
