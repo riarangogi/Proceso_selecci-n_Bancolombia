@@ -66,3 +66,9 @@ FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
+
+-- 1 ¿Cuales son las zonas más concurridas de la ciudad ?.
+
+-- Crear tabla temporal para almacenar la consulta
+CREATE TEMPORARY TABLE bar_disp (nombre_barrio varchar(20),id_disp int(15));
+INSERT INTO bar_disp SELECT nombre_barrio , id_disp FROM barrios INNER JOIN dispositivos ON barrios.id_barrio=dispositivos.id_barrio;
