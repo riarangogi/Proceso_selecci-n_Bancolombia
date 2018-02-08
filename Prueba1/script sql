@@ -72,3 +72,15 @@ IGNORE 1 ROWS;
 -- Crear tabla temporal para almacenar la consulta
 CREATE TEMPORARY TABLE bar_disp (nombre_barrio varchar(20),id_disp int(15));
 INSERT INTO bar_disp SELECT nombre_barrio , id_disp FROM barrios INNER JOIN dispositivos ON barrios.id_barrio=dispositivos.id_barrio;
+
+
+-- Crear tabla temporal para almacenar la consulta
+CREATE TEMPORARY TABLE disp_cli (id_disp int(15),num_trx int,);
+INSERT INTO bar_disp SELECT dispositivos.id_disp,num_trx FROM dispositivos INNER JOIN clientes ON dispositivos.id_disp=clientes.id_disp;
+
+-- Crear tabla temporal para almacenar la consulta
+CREATE TEMPORARY TABLE bar_cli (nombre_barrio varchar(20),num_trx int,);
+INSERT INTO bar_cli SELECT nombre_barrio,num_trx FROM bar_disp INNER JOIN disp_cli ON bar_disp.id_disp=disp_cli.id_disp;
+
+--se suman las ttrx realizadas en cada barrio
+SELECT nombre_barrio, Sum(num_trx)FROM bar_cli GROUP BY nombre_barrio;
