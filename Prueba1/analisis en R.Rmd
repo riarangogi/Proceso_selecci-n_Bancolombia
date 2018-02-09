@@ -191,3 +191,30 @@ head(bar_cli)
 
 
 ```
+
+###2.   ¿Cuántos dispositivos y de que tipo se encuentran en cada zona de la ciudad?
+
+Para dar respuesta a esta pregunta, se debe crear una tabla temporal cuyas columnas sean el nombre del barrio, el id del dispositivo y su tipo. 
+
+```{r,echo=TRUE}
+bar_disp<-join(table_barrios,table_dispositivos,type='inner')
+
+#mostrar solo las columnas id_disp y nombre_barrio
+bar_disp<-bar_disp[,2:4]
+```
+
+Ya con esta tabla solo queda agregar los dispositivos por su tipo y el barrio en el que se encuentran y así contar dichos dispositivos. 
+
+```{r,echo=TRUE}
+
+#cambiamos la columna id_disp por un vector de unos, pues solo nos intereza
+# saber que hay un dispositivo
+bar_disp$id_disp<-rep(1,length(bar_disp$nombre_barrio))
+
+#contamos los dispositivos presentes en cada barrio respecto a su tipo
+bar_disp_tipo<-aggregate(id_disp~nombre_barrio+tipo_disp,bar_disp,FUN = sum)
+
+head(bar_disp_tipo)
+```
+
+3.   ¿Cuales son las zonas más importantes (transaccionalmente) para cada cliente (donde realiza el 65% de sus compras)?. Nota:  Todos los clientes deben tener al menos una zona de influencia.
