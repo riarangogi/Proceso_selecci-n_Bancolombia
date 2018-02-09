@@ -7,9 +7,9 @@ output: html_document
 
 El objetivo de la prueba es procesar la información anterior para responder las siguientes preguntas y ejercicios:
 
-1.   ¿Cuántos dispositivos y de que tipo se encuentran en cada zona de la ciudad?
+1.   ¿Cuales son las zonas más concurridas de la ciudad ?
 
-2.   ¿Cuales son las zonas más concurridas de la ciudad ?
+2.   ¿Cuántos dispositivos y de que tipo se encuentran en cada zona de la ciudad?
 
 3.   ¿Cuales son las zonas más importantes (transaccionalmente) para cada cliente (donde realiza el 65% de sus compras)?. Nota:  Todos los clientes deben tener al menos una zona de influencia.
 
@@ -25,7 +25,7 @@ Como primero nosotros cargaremos los "datos crudos", estos son 3 archivos .csv y
 
 ·         exa__trx_clientes : contiene el número  transacciones de varios clientes realizados en algunos de  los anteriores dispositivos.
 
-```{r,echo=TRUE}
+```{r,echo=FALSE}
 #Los 3 son archivos separados por comas y con encabezados (nombres de columnas)
 data_barrios<-read.csv('Datos Crudos/exa__barrios_cali.csv',sep = ',',
                        header = TRUE,stringsAsFactors = FALSE )
@@ -41,7 +41,7 @@ data_clientes<-read.csv('Datos Crudos/exa__trx_clientes.csv',sep = ',',
 
 Hacemos un resumen de las columnas presentes en cada archivo con el fin de advertir una anomalia a simple vista
 
-```{r,echo=TRUE}
+```{r,echo=FALSE}
 str(data_barrios)
 
 str(data_dispositivos)
@@ -53,7 +53,7 @@ notemos que muchas de estas variables son de tipo categoricas, es decir que aunq
 
 Busquemos ahora si hay datos faltantes (NA) y valores anomalos
 
-```{r,echo=TRUE}
+```{r,echo=FALSE}
 #La función complete.cases nos dice en que filas no hay NA
 barrios_na<-complete.cases(data_barrios)
 table(barrios_na) #No hay valores faltantes
@@ -67,7 +67,7 @@ table(clientes_na) #No hay valores faltantes
 
 Tal como se advirtio más arriba, las variables que denotan algún número de identificación no pueden ser negativas, Así, usaremos esta premisa para detectar valores perdidos (o anomalos)
 
-```{r,echo=TRUE}
+```{r,echo=FALSE}
 min_codigo_barrios<-min(data_barrios$codigo)
 min_codigo_barrios #El minimo es positivo, con lo que nos aseguramos que ninguno es negativo
 
@@ -88,7 +88,7 @@ table(data_clientes$tipo_doc)#Hay 14 datos anomalos en esta columna, tipo_doc  =
 
 Ya que no hay valores ausentes y solamente encontramos valores anomalos en el archivo alusivo a los clientes, entonces procedemos a crear un nuevo data frame sin tales valores
 
-```{r,echo=TRUE}
+```{r,echo=FALSE}
 data_clientes_tidy<-subset(data_clientes,
                            subset = num_doc>0 & tipo_doc %in% c(1,2) ,#solo consideramos las filas con num_doc positivo y que el tipo_doc sea 1 o 2
                            select = num_doc:num_trx)
@@ -96,7 +96,7 @@ data_clientes_tidy<-subset(data_clientes,
 
 Ahora solo queda cambiar de nombre las columnas y guardar los datos limpios.
 
-```{r,echo=TRUE}
+```{r,echo=FALSE}
 #Ponemos los mismos nombres de columnas en las tablas
 names(data_barrios)<-c('id_barrio','nombre_barrio')
 
@@ -106,14 +106,88 @@ names(data_dispositivos)<-c('tipo_disp','id_disp','latitud','longitud',
 names(data_clientes_tidy)<-c('id_cliente','tipo_doc','tipo_disp','id_disp',
                              'num_trx')
 
-#Creeamos una carpeta llamada "Datos Limpios" para guardar los archivos allí
-dir.create('./Datos Limpios')
+```
 
-write.csv(data_barrios,'./Datos Limpios/barrios_tidy.csv',row.names = FALSE)
+Para más detalle ver el archivo "script limpiar datos.R".
 
-write.csv(data_dispositivos,'./Datos Limpios/dispositivos_tidy.csv',
-          row.names = FALSE)
 
-write.csv(data_clientes_tidy,'./Datos Limpios/clientes_tidy.csv',
-          row.names = FALSE)
+###1.   ¿Cuales son las zonas más concurridas de la ciudad ?
+
+Estas zonas las podemos ver como los barrios en los que se hacen más transacciones.
+Para eso es necesario calcular el total de transacciones realizadas por los clientes en cada barrio. 
+
+```{r,echo=FALSE}
+library(data.table)
+library(plyr)
+
+
+##1·¿Cuales son las zonas más concurridas de la ciudad ?.
+
+
+#Leer archilvos
+data_barrios<-read.csv('./Datos Limpios/barrios_tidy.csv',header = TRUE,
+                        sep = ',',stringsAsFactors = FALSE)
+
+data_clientes<-read.csv('./Datos Limpios/clientes_tidy.csv',header = TRUE,
+                       sep = ',',stringsAsFactors = FALSE)
+
+data_dispositivos<-read.csv('./Datos Limpios/dispositivos_tidy.csv',
+                            header = TRUE, sep = ',',stringsAsFactors = FALSE)
+
+#convertir en tablas y asignarles un identificador
+table_barrios<-data.table(data_barrios,key = 'id_barrio')
+
+table_dispositivos<-data.table(data_dispositivos,key = 'id_disp')
+
+table_clientes<-data.table(data_clientes,key = 'id_cliente')
+
+```
+
+Primero relacionamos los dispositivos con los barrios. Notemos que la variable “id_barrio” está en ambas tablas por lo que resulta sencillo crear una tabla en la que sus columnas sean los nombres de los barrios y en la otra columna el “id_disp”. 
+```{r,echo=TRUE}
+#hacer un inner join 
+bar_disp<-join(table_barrios,table_dispositivos,type='inner')
+
+#mostrar solo las columnas id_disp y nombre_barrio
+bar_disp<-bar_disp[,c(2,4)]
+
+
+```
+
+Lo segundo es relacionar la tabla clientes con la tabla dispositivo. Esto con el fin de cuantas transacciones se hicieron desde cada dispositivo. Es así como la tabla provisional debe tener por columnas “id_disp” y “num_trx”. 
+
+```{r,echo=TRUE}
+#hacer un inner join 
+disp_cli<-join(table_dispositivos,table_clientes,type='inner')
+
+#mostrar solo las columnas id_disp y num_trx
+disp_cli<-disp_cli[,c(2,8)]
+```
+
+Y por último se relacionan ambas tablas y con una función de suma, sumar las transacciones que se hicieron en cada barrio. 
+
+```{r,echo=TRUE}
+#hacer un inner join 
+bar_cli<-join(bar_disp,disp_cli,type='inner')
+
+#mostrar solo las columnas nombre_barrio y num_trx
+bar_cli<-bar_cli[,c(1,3)]
+
+#agrupar por el nombre del barrio y sumar las trx allí realizadas
+bar_cli<-aggregate(num_trx~nombre_barrio,bar_cli,FUN = sum)
+```
+
+Para darle respuesta a la pregunta inicial se debe de organizar la lista de mayor a menor número de transacciones. 
+
+```{r,echo=FALSE}
+#ordenar los barrios de mayor a meenor segun el número de trx
+bar_cli<-bar_cli[order(bar_cli$num_trx,decreasing = TRUE),]
+
+x<-bar_cli[1:6,]
+
+barplot(x$num_trx,names.arg = x$nombre_barrio,ylab = 'Transacciones',main = 'Las 6 zonas más concurridas de la ciudad')
+
+head(bar_cli)
+
+
 ```
