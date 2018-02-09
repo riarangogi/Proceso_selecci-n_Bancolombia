@@ -1,5 +1,5 @@
 ---
-title: "Untitled"
+title: "Análisis prueba 1"
 author: "Ricardo Arango Giraldo"
 date: "6 de febrero de 2018"
 output: html_document
@@ -290,3 +290,17 @@ cli_trx_bar<-subset(cli_trx_bar,num_trx<=pct,select = c(id_cliente,nombre_barrio
 
 head(cli_trx_bar)
 ```
+
+
+###4.    Identifique una forma de identificar una zona distinta a los barrios.  Como lo haría?, proponga un codigo para hacerlo.
+
+
+Dividir la ciudad respecto a su característica de consumo, es decir: teniendo en cuenta la capacidad adquisitiva de la gente y sus canales más frecuentes de pago. Eso permitirá 
+orientar campañas más personalizadas a los clientes y hacer más viables gran cantidad de posibles estrategias. 
+
+Tenemos pues la cantidad de transacciones hechas en cada barrio y por aparte cuantas transacciones se hicieron en cada barrio respecto al tipo de dispositivo usado. Si cruzaramos esa información con la cifra realizada en la transacción, entonces tendríamos una forma más eficiente para dividir la ciudad. 
+
+
+### Importante
+
+El codigo se corrio en un UBUNTU 17.10. La versión de R y de MySQL son 3.4 y 5.7 respectivamente.
